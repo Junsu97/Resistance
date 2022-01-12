@@ -142,7 +142,7 @@ public class PlayerAtk : PlayerAttack
     protected override void Dodge()
     {
         base.Dodge();
-        if (canDodge)
+        if (canDodge && !playerStatement.dead && playerStatement.currentState != PlayerStatement.State.Attack)
         {
             ani.SetTrigger("DoDodge");
             time_D.fillAmount = 1f;

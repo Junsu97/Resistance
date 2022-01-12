@@ -21,7 +21,7 @@ public class Vampire : Enemy
         {
             nav.isStopped = true;
             owner.StartCoroutine("VampireAttackCoroutine");
-            LookTarget();
+            owner.transform.LookAt(owner.targetObj.transform);
         }
 
         public void OperateExit()
@@ -31,13 +31,12 @@ public class Vampire : Enemy
 
         public void OperateUpdate()
         {
+            if(owner.dead)
+            {
+                owner.StopCoroutine("VampireAttackCoroutine");
+            }
         }
-        private void LookTarget()
-        {
-            Vector3 dir = owner.targetObj.transform.position - owner.transform.position;
 
-            owner.transform.rotation = Quaternion.Lerp(owner.transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * owner.rotateSpeed);
-        }
     }
     protected class VampireParing : IState
     {
@@ -84,7 +83,7 @@ public class Vampire : Enemy
     {
         if (col.tag == "Player" || col.tag == "DodgePlayer")
         {
-            if (!dead && !Back)
+            if (!dead)
             {
                 if (!targetObj.GetComponent<LivingObjects>().dead)
                 {
@@ -108,16 +107,17 @@ public class Vampire : Enemy
         AttackEffect.SetActive(false);
         attackArea.SetActive(false);
 
-        float x = Random.Range(1.5f, 2.5f);
+        float x = Random.Range(1f, 1.5f);
         yield return new WaitForSeconds(x);
 
-        if(targetObj != null && !Back)
+        if (targetObj != null)
         {
             stateMachine.SetState(stateDic[EnemyState.Chase]);
         }
-        else if(targetObj == null)
+        else if (targetObj == null)
         {
             stateMachine.SetState(stateDic[EnemyState.Patrol]);
         }
+        
     }
 }

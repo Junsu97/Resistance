@@ -229,7 +229,6 @@ public class DBManager : Singleton<DBManager>
         for (int i = 0; i < temp.enemyList.Count; i++)
         {
             enemyDict[temp.enemyList[i].enemyId] = temp.enemyList[i];
-            Debug.Log(temp.enemyList[i].enemyName);
         }
     }
 }

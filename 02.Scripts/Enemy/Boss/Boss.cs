@@ -6,7 +6,6 @@ using UnityEngine.AI;
 public class Boss : Enemy
 {
   
-    public float paringChance;
     [Header("Attack")]
     public GameObject attackArea;
     public GameObject attackDetectArea;
@@ -62,7 +61,7 @@ public class Boss : Enemy
         stateDic[EnemyState.Skill2] = skill2;
 
         //targetObj = GameManager.Instance.player.gameObject;
-
+        PlayerDetectArea.SetActive(true);
         attackDetectArea.GetComponent<TriggerCallback>().CollisionStayEvent += AttackDetectAreaStay;
         attackArea.GetComponent<TriggerCallback>().CollisionEnterEvent += BossAttackArea;
 
@@ -110,7 +109,6 @@ public class Boss : Enemy
 
         public void OperateExit()
         {
-            nav.isStopped = false;
         }
 
         public void OperateUpdate()
@@ -135,7 +133,6 @@ public class Boss : Enemy
 
         public void OperateExit()
         {
-            nav.isStopped = false;
         }
 
         public void OperateUpdate()
@@ -161,7 +158,6 @@ public class Boss : Enemy
 
         public void OperateExit()
         {
-            nav.isStopped = false;
         }
 
         public void OperateUpdate()
@@ -186,7 +182,6 @@ public class Boss : Enemy
 
         public void OperateExit()
         {
-            nav.isStopped = false;
         }
 
         public void OperateUpdate()
@@ -212,7 +207,6 @@ public class Boss : Enemy
 
         public void OperateExit()
         {
-            nav.isStopped = false;
         }
 
         public void OperateUpdate()
@@ -238,7 +232,6 @@ public class Boss : Enemy
 
         public void OperateExit()
         {
-            nav.isStopped = false;
         }
 
         public void OperateUpdate()
@@ -251,25 +244,23 @@ public class Boss : Enemy
     {
         if (col.gameObject == targetObj && !dead)
         {
-            if (targetObj.GetComponent<PlayerStatement>().currentState == PlayerStatement.State.Attack)
+            if (stateMachine.CurrentState == stateDic[EnemyState.Chase] || stateMachine.CurrentState == stateDic[EnemyState.Idle]) 
             {
-                if (ParingChance())
+                if(!ani.GetCurrentAnimatorStateInfo(0).IsName("GetHit") && ani.GetInteger("Attack") == 0)
                 {
-                    stateMachine.SetState(stateDic[EnemyState.Paring]);
+                    int rand = Random.Range((int)EnemyState.Attack, (int)EnemyState.Skill2 + 1);
+                    stateMachine.SetState(stateDic[(EnemyState)rand]);
+                    Debug.Log(ani.GetInteger("Attack"));
+                }
+                else
+                {
+                    return;
                 }
             }
-
-            if (stateMachine.CurrentState == stateDic[EnemyState.Chase])
+            else if(stateMachine.CurrentState == stateDic[EnemyState.Paring])
             {
-                int rand = Random.Range((int)EnemyState.Attack, (int)EnemyState.Skill2 + 1);
-                stateMachine.SetState(stateDic[(EnemyState)rand]);
-
-                
+                return;
             }
-        }
-        else if(dead)
-        {
-            Die();
         }
     }
     
@@ -283,44 +274,43 @@ public class Boss : Enemy
     }
     
 
-    private bool ParingChance()
-    {
-        float rand = Random.Range(1f, 100f);
-        return rand <= paringChance;
-    }
+
 
     IEnumerator BossAttackCoroutine()
     {
         transform.LookAt(targetObj.transform);
-        ani.SetTrigger("Attack");
-        yield return new WaitForSeconds(0.14f);
+        ani.SetInteger("Attack",1);
+        yield return new WaitForSeconds(0.45f);
         attackArea.SetActive(true);
         attackEffect.SetActive(true);
-        audioSource.PlayOneShot(attackClip, 1f);
+        audioSource.PlayOneShot(attackClip, 0.5f);
 
-        yield return new WaitForSeconds(0.22f);
+        yield return new WaitForSeconds(0.28f);
         attackEffect.SetActive(false);
         attackArea.SetActive(false);
 
-        yield return new WaitForSeconds(0.7f);
+        yield return new WaitForSeconds(0.73f);
+        transform.LookAt(targetObj.transform);
         attackEffect_2.SetActive(true);
         attackArea.SetActive(true);
-        audioSource.PlayOneShot(attackClip, 1f);
+        audioSource.PlayOneShot(attackClip, 0.5f);
 
         yield return new WaitForSeconds(0.2f);
         attackEffect_2.SetActive(false);
         attackArea.SetActive(false);
 
         yield return new WaitForSeconds(0.87f);
+        transform.LookAt(targetObj.transform);
         attackArea.SetActive(true);
         attackEffect_3.SetActive(true);
-        audioSource.PlayOneShot(attackClip, 1f);
+        audioSource.PlayOneShot(attackClip, 0.5f);
 
         yield return new WaitForSeconds(0.2f);
         attackEffect_3.SetActive(false);
         attackArea.SetActive(false);
-
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.1f);
+        ani.SetInteger("Attack", 0);
+        //yield return new WaitForSeconds(0.6f);
         if (targetObj.GetComponent<LivingObjects>().dead)
         {
             stateMachine.SetState(stateDic[EnemyState.Idle]);
@@ -335,34 +325,39 @@ public class Boss : Enemy
     IEnumerator BossAttack_2Corountine()
     {
         transform.LookAt(targetObj.transform);
-        ani.SetTrigger("Attact_2");
-        yield return new WaitForSeconds(0.2f);
+        ani.SetInteger("Attack", 2);
+        yield return new WaitForSeconds(0.6f);
         attackArea.SetActive(true);
         attack2Effect.SetActive(true);
-        audioSource.PlayOneShot(attackClip, 1f);
+        audioSource.PlayOneShot(attackClip, 0.5f);
 
         yield return new WaitForSeconds(0.8f);
         attackArea.SetActive(false);
         attack2Effect.SetActive(false);
 
         yield return new WaitForSeconds(0.14f);
+        transform.LookAt(targetObj.transform);
         attackArea.SetActive(true);
         attack2Effect_2.SetActive(true);
-        audioSource.PlayOneShot(attackClip, 1f);
+        audioSource.PlayOneShot(attackClip, 0.5f);
 
         yield return new WaitForSeconds(0.86f);
         attack2Effect_2.SetActive(false);
         attackArea.SetActive(false);
 
         yield return new WaitForSeconds(0.13f);
+        transform.LookAt(targetObj.transform);
         attackArea.SetActive(true);
         attack2Effect_2.SetActive(true);
-        audioSource.PlayOneShot(attackClip, 1f);
+        audioSource.PlayOneShot(attackClip, 0.5f);
 
         yield return new WaitForSeconds(0.97f);
         attackArea.SetActive(false);
         attack2Effect_2.SetActive(false);
-        yield return new WaitForSeconds(1f);
+        ani.SetInteger("Attack", 0);
+
+        yield return new WaitForSeconds(0.1f);
+       // yield return new WaitForSeconds(0.6f);
         if (targetObj.GetComponent<LivingObjects>().dead)
         {
             stateMachine.SetState(stateDic[EnemyState.Idle]);
@@ -373,46 +368,50 @@ public class Boss : Enemy
         }
 
     }
-    private void Skill_1Set()
-    {
-        Skill_1Area_1.GetComponent<Skill_1>().skill_1Range = this.skillRange;
-        Skill_1Area_1.GetComponent<Skill_1>().skill_1Speed = this.skillSpeed;
-        Skill_1Area_1.GetComponent<Skill_1>().Skill_1Damage = this.skillDamage;
 
-        Skill_1Area_2.GetComponent<Skill_1>().skill_1Range = this.skillRange;
-        Skill_1Area_2.GetComponent<Skill_1>().skill_1Speed = this.skillSpeed;
-        Skill_1Area_2.GetComponent<Skill_1>().Skill_1Damage = this.skillDamage;
-
-        Skill_1Area_3.GetComponent<Skill_1>().skill_1Range = this.skillRange;
-        Skill_1Area_3.GetComponent<Skill_1>().skill_1Speed = this.skillSpeed;
-        Skill_1Area_3.GetComponent<Skill_1>().Skill_1Damage = this.skillDamage;
-
-        Skill_1Area_4.GetComponent<Skill_1>().skill_1Range = this.skillRange;
-        Skill_1Area_4.GetComponent<Skill_1>().skill_1Speed = this.skillSpeed;
-        Skill_1Area_4.GetComponent<Skill_1>().Skill_1Damage = this.skillDamage;
-    }
     IEnumerator BossSkill_1Coroutine()
     {
+
+        Skill_1 skill_1 = Skill_1Area_1.GetComponent<Skill_1>();
+        skill_1.skill_1Range = this.skillRange;
+        skill_1.skill_1Speed = this.skillSpeed;
+        skill_1.Skill_1Damage = this.skillDamage;
+
+        Skill_1 skill_2 = Skill_1Area_2.GetComponent<Skill_1>();
+        skill_2.skill_1Range = this.skillRange;
+        skill_2.skill_1Speed = this.skillSpeed;
+        skill_2.Skill_1Damage = this.skillDamage;
+
+        Skill_1 skill_3 = Skill_1Area_3.GetComponent<Skill_1>();
+        skill_3.skill_1Range = this.skillRange;
+        skill_3.skill_1Speed = this.skillSpeed;
+        skill_3.Skill_1Damage = this.skillDamage;
+
+        Skill_1 skill_4 = Skill_1Area_4.GetComponent<Skill_1>();
+        skill_4.skill_1Range = this.skillRange;
+        skill_4.skill_1Speed = this.skillSpeed;
+        skill_4.Skill_1Damage = this.skillDamage;
+
         transform.LookAt(targetObj.transform);
-        ani.SetTrigger("Skill");
-        Skill_1Set(); // 스킬 데미지 거리 속도 설정
+        ani.SetInteger("Attack", 3);
+
         Skill_1Area_1.SetActive(true);
         Skill_1Area_2.SetActive(true);
         Skill_1Area_3.SetActive(true);
         Skill_1Area_4.SetActive(true);
 
-        yield return new WaitForSeconds(0.14f);
+        yield return new WaitForSeconds(0.6f);
         Skill_1Effect_1.SetActive(true);
         Skill_1Effect_2.SetActive(true);
         Skill_1Effect_3.SetActive(true);
         Skill_1Effect_4.SetActive(true);
-        audioSource.PlayOneShot(skillClip, 2f);
-        yield return new WaitForSeconds(0.2f);
+        audioSource.PlayOneShot(skillClip, 2.5f);
+        yield return new WaitForSeconds(0.35f);
         Skill_1Area_1.GetComponent<SphereCollider>().enabled = true;
         Skill_1Area_2.GetComponent<SphereCollider>().enabled = true;
         Skill_1Area_3.GetComponent<SphereCollider>().enabled = true;
         Skill_1Area_4.GetComponent<SphereCollider>().enabled = true;
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.1f);
         Skill_1Effect_1.SetActive(false);
         Skill_1Area_1.SetActive(false);
         Skill_1Effect_2.SetActive(false);
@@ -421,7 +420,7 @@ public class Boss : Enemy
         Skill_1Area_3.SetActive(false);
         Skill_1Effect_4.SetActive(false);
         Skill_1Area_4.SetActive(false);
-        yield return new WaitForSeconds(0.86f);
+        ani.SetInteger("Attack", 0);
         if(targetObj.GetComponent<LivingObjects>().dead)
         {
             stateMachine.SetState(stateDic[EnemyState.Idle]);
@@ -435,7 +434,7 @@ public class Boss : Enemy
     {
         Skill_2DetectArea.GetComponent<Skill_2>().skillDamage = this.Skill_2Damage;
         transform.LookAt(targetObj.transform);
-        ani.SetTrigger("Skill_2");
+        ani.SetInteger("Attack",4);
         Skill_2StartEffect.SetActive(true);
         yield return new WaitForSeconds(0.2f);
         Skill_2Effect.SetActive(true);
@@ -446,7 +445,8 @@ public class Boss : Enemy
         yield return new WaitForSeconds(0.5f);
         Skill_2Effect.SetActive(false);
         Skill_2DetectArea.SetActive(false);
-                yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.1f);
+        ani.SetInteger("Attack", 0);
 
         if (targetObj.GetComponent<LivingObjects>().dead)
         {
@@ -464,6 +464,16 @@ public class Boss : Enemy
         ParingEffect.SetActive(true);
         yield return new WaitForSeconds(0.18f);
         ParingEffect.SetActive(false);
+        yield return new WaitForSeconds(0.1f);
+
+        if (targetObj.GetComponent<LivingObjects>().dead)
+        {
+            stateMachine.SetState(stateDic[EnemyState.Idle]);
+        }
+        else
+        {
+            stateMachine.SetState(stateDic[EnemyState.Chase]);
+        }
     }
     
     IEnumerator CounterAttackCoroutine()
@@ -477,7 +487,9 @@ public class Boss : Enemy
         slash.SetActive(true);
         SlashDetectArea.GetComponent<Slash>().isFire = true;
         SlashDetectArea.SetActive(true);
-        yield return new WaitForSeconds(0.96f);
+        yield return new WaitForSeconds(0.6f);
+        slash.SetActive(false);
+        SlashDetectArea.SetActive(false);
         if (targetObj.GetComponent<LivingObjects>().dead)
         {
             stateMachine.SetState(stateDic[EnemyState.Idle]);
@@ -486,12 +498,6 @@ public class Boss : Enemy
         {
             stateMachine.SetState(stateDic[EnemyState.Chase]);
         }
-        slash.SetActive(false);
-        SlashDetectArea.SetActive(false);
     }
-    private void StepClip()
-    {
-        audioSource.PlayOneShot(stepClip, 0.3f);
-    }
-
+   
 }

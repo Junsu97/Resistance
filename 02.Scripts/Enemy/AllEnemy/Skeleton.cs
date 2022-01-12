@@ -20,7 +20,7 @@ public class Skeleton : Enemy
         {
             nav.isStopped = true;
             owner.StartCoroutine("SkeletonAttackCoroutine");
-            LookTarget();
+            owner.transform.LookAt(owner.targetObj.transform);
         }
 
         public void OperateExit()
@@ -34,12 +34,7 @@ public class Skeleton : Enemy
         public void OperateUpdate()
         {
         }
-        private void LookTarget()
-        {
-            Vector3 dir = owner.targetObj.transform.position - owner.transform.position;
-
-            owner.transform.rotation = Quaternion.Lerp(owner.transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * owner.rotateSpeed);
-        }
+       
     }
     protected class SkeletonParing : IState
     {
@@ -93,7 +88,7 @@ public class Skeleton : Enemy
     {
         if(col.tag == "Player" || col.tag == "DodgePlayer")
         {
-            if(!dead && !Back)
+            if(!dead)
             {
                if(!targetObj.GetComponent<LivingObjects>().dead && stateMachine.CurrentState != stateDic[EnemyState.Attack] && stateMachine.CurrentState != stateDic[EnemyState.Patrol])
                 {
@@ -111,13 +106,13 @@ public class Skeleton : Enemy
         yield return new WaitForSeconds(0.16f);
         attackArea.SetActive(false);
 
-        yield return new WaitForSeconds(1.8f);
+        yield return new WaitForSeconds(1f);
 
-        if(targetObj != null && !Back)
+        if(targetObj != null)
         {
             stateMachine.SetState(stateDic[EnemyState.Chase]);
         }
-        else if(targetObj == null)
+        else
         {
             stateMachine.SetState(stateDic[EnemyState.Patrol]);
         }
