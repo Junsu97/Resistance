@@ -68,6 +68,7 @@ public class EnemySpawn : MonoBehaviour
         GameObject enemyObj = ObjectPoolingManager.Instance.GetQueue(enemyData.enemyName, false);
         Enemy enemy = enemyObj.GetComponent<Enemy>();
         enemy.nav.enabled = true;
+        enemy.PlayerDetectArea.SetActive(true);
         SetEnemy(enemy, enemyData);
         RandomSpawnPos(spawnPos);
         enemy.wayPointIndex = Random.Range(0, enemy.wayPoints.Length - 1);

@@ -354,7 +354,7 @@ public class StoreUI : MonoBehaviour
             GameManager.Instance.playerStatement.PotionTextRefresh();
         }
 
-        GameManager.Instance.playerStatement.inventory.AddGold((int)(selectedItem.price * 0.7f));
+        GameManager.Instance.playerStatement.inventory.AddGold((int)(selectedItem.price * 0.7f) + 1);
         RefreshStore();
 
         itemInfo.SetActive(false);

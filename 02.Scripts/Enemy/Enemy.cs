@@ -13,10 +13,10 @@ public class Enemy : LivingObjects
     public int exp;
 
     public float rotateSpeed = 2f;
+    public float paringChance;
 
-   // [HideInInspector]
+    // [HideInInspector]
     public GameObject targetObj;
-    public bool Back = false;
     [SerializeField]
     public int wayPointIndex;
     public GameObject[] wayPoints;
@@ -43,12 +43,11 @@ public class Enemy : LivingObjects
         IState idle = new EnemyIdle(this);
         IState chase = new EnemyChase(this);
         IState die = new EnemyDie(this);
-        
         IState patrol = new EnemyPatrol(this);
+        ani.SetBool("Dead", dead);
         stateDic[EnemyState.Patrol] = patrol;
         PlayerDetectArea.SetActive(true);
         PlayerDetectArea.GetComponent<TriggerCallback>().CollisionStayEvent += PlayerDetectAreaInStay;
-        
         stateMachine = new StateMachine(idle);
         
         stateDic[EnemyState.Idle] = idle;
@@ -75,18 +74,15 @@ public class Enemy : LivingObjects
         Attack2,
         Skill1,
         Skill2,
-        Back,
         Die
     };
 
     protected class EnemyIdle : IState
     {
         private Enemy owner;
-        private bool Back;
         public EnemyIdle(Enemy owner)
         {
             this.owner = owner;
-            this.Back = owner.Back;
         }
         public void OperateEnter()
         {
@@ -94,11 +90,11 @@ public class Enemy : LivingObjects
 
         public void OperateUpdate()
         {
-            if(!Back && owner.targetObj != null)//&& !owner.targetObj.GetComponent<LivingObjects>().dead)
+            if(owner.targetObj != null)//&& !owner.targetObj.GetComponent<LivingObjects>().dead)
             {
                 owner.stateMachine.SetState(owner.stateDic[EnemyState.Chase]);
             }
-            else if(!Back && owner.targetObj == null && owner.enemyType != EnemyData.EnemyType.boss)
+            else if(owner.targetObj == null && owner.enemyType != EnemyData.EnemyType.boss)
             {
                 owner.stateMachine.SetState(owner.stateDic[EnemyState.Patrol]);
             }
@@ -122,17 +118,16 @@ public class Enemy : LivingObjects
         private Enemy owner;
         private NavMeshAgent nav;
         private Animator ani;
-        private bool Back;
         public EnemyChase(Enemy owner)
         {
             this.owner = owner;
             this.nav = owner.nav;
             this.ani = owner.ani;
-            this.Back = owner.Back;
         }
 
         public void OperateEnter()
         {
+            nav.isStopped = false;
             ani.SetFloat("Move", 1f);
         }
 
@@ -145,7 +140,7 @@ public class Enemy : LivingObjects
         {
             if (owner.targetObj == null || owner.targetObj.GetComponent<LivingObjects>().dead)
             {
-                if(!Back && owner.enemyType != EnemyData.EnemyType.boss)
+                if(owner.enemyType != EnemyData.EnemyType.boss)
                 {
                     owner.stateMachine.SetState(owner.stateDic[EnemyState.Patrol]);
                 }
@@ -174,67 +169,7 @@ public class Enemy : LivingObjects
             }
         }
     }
-    protected class EnemyBack : IState
-    {
-        private Enemy owner;
-        private NavMeshAgent nav;
-        private Animator ani;
-        private GameObject[] wayPoints;
-        private int wayPointIndex;
-        private bool Back;
-        public EnemyBack(Enemy owner)
-        {
-            this.owner = owner;
-            this.nav = owner.nav;
-            this.ani = owner.ani;
-            this.wayPoints = owner.wayPoints;
-            this.wayPointIndex = owner.wayPointIndex;
-            this.Back = owner.Back;
-        }
-
-        public void OperateEnter()
-        {
-            if (!owner.dead)
-            {
-                wayPointsDir();
-                owner.enemySlider.gameObject.SetActive(false);
-                owner.health = owner.baseMaxHealth;
-                nav.SetDestination(wayPoints[wayPointIndex].transform.position);
-                ani.SetFloat("Move", 1f);
-            }
-        }
-
-        public void OperateExit()
-        {
-            Back = false;
-            ani.SetFloat("Move", 0f);
-        }
-
-        public void OperateUpdate()
-        {
-            CheckEndBack();
-            if(owner.dead)
-            {
-                owner.stateMachine.SetState(owner.stateDic[EnemyState.Die]);
-            }
-        }
-        private void wayPointsDir()
-        {
-            Vector3 dir = wayPoints[wayPointIndex].transform.position - owner.transform.position;
-            dir.y = 0f;
-            Quaternion rot = Quaternion.LookRotation(dir);
-            owner.transform.rotation = Quaternion.Lerp(owner.transform.rotation, rot, Time.deltaTime * owner.rotateSpeed);
-        }
-        private void CheckEndBack()
-        {
-            float dis = Vector3.Distance(wayPoints[wayPointIndex].transform.position, owner.transform.position); 
-            if(dis < 7f)
-            {
-                Back = false;
-                owner.stateMachine.SetState(owner.stateDic[EnemyState.Patrol]);
-            }
-        }
-    }
+    
 
     protected class EnemyPatrol : IState
     {
@@ -243,7 +178,6 @@ public class Enemy : LivingObjects
         private Animator ani;
         private GameObject[] wayPoints;
         private int wayPointIndex;
-        private bool Back;
         public EnemyPatrol(Enemy owner)
         {
             this.owner = owner;
@@ -251,7 +185,6 @@ public class Enemy : LivingObjects
             this.ani = owner.GetComponent<Animator>();
             this.wayPointIndex = owner.wayPointIndex;
             this.wayPoints = owner.wayPoints;
-            this.Back = owner.Back;
         }
 
         public void OperateEnter()
@@ -259,6 +192,7 @@ public class Enemy : LivingObjects
             //owner.transform.rotation = Quaternion.Euler(wayPoints[wayPointIndex].transform.position);
             if(!owner.dead)
             {
+                nav.isStopped = false;
                 wayPointsDir();
                 owner.enemySlider.gameObject.SetActive(false);
                 owner.health = owner.baseMaxHealth;
@@ -280,7 +214,7 @@ public class Enemy : LivingObjects
         }
         private void ToChase()
         {
-            if(!Back && owner.targetObj != null && !owner.targetObj.GetComponent<LivingObjects>().dead && !owner.dead)
+            if(owner.targetObj != null && !owner.targetObj.GetComponent<LivingObjects>().dead && !owner.dead)
             {
                 owner.stateMachine.SetState(owner.stateDic[EnemyState.Chase]);
             }
@@ -288,7 +222,7 @@ public class Enemy : LivingObjects
         private void NextPatrol()
         {
             float dis = Vector3.Distance(owner.transform.position, wayPoints[wayPointIndex].transform.position);
-            if(dis <= 7f && !owner.dead && !Back)
+            if(dis <= 7f && !owner.dead)
             {
                 ani.SetFloat("Move", 0);
                 wayPointIndex = Random.Range(0, wayPoints.Length);
@@ -327,6 +261,7 @@ public class Enemy : LivingObjects
         public void OperateEnter()
         {
             ani.SetTrigger("Die");
+            ani.ResetTrigger("GetHit");
         }
 
         public void OperateExit()
@@ -356,16 +291,16 @@ public class Enemy : LivingObjects
         {
             TraceExit();
         }
-        else if(col.tag == "Limit")
-        {
-            Back = true;
-            stateMachine.SetState(stateDic[EnemyState.Back]);
-        }
     }
 
     private void TraceExit()
     {
         targetObj = null;
+    }
+    private bool ParingChance()
+    {
+        float rand = Random.Range(1f, 100f);
+        return rand <= paringChance;
     }
 
     public override void OnDamage(float damage, Vector3 hitPoint, Vector3 hitNormal, bool isCrit = false)
@@ -374,13 +309,28 @@ public class Enemy : LivingObjects
         if(!dead && stateMachine.CurrentState != stateDic[EnemyState.Paring])
         {
             base.OnDamage(damage, hitPoint, hitNormal, isCrit);
+
             audioSource.PlayOneShot(hitClip, 0.4f);
             GameManager.Instance.cam.ShakeCam(0.1f, 0.2f);
-            ani.SetTrigger("GetHit");
-            if (enemyType == EnemyData.EnemyType.boss)
+            if (enemyType == EnemyData.EnemyType.boss) 
             {
                 enemySlider.isBoss = true;
                 enemySlider.bossNameText.text = name;
+                if (targetObj.GetComponent<PlayerStatement>().currentState == PlayerStatement.State.Attack)
+                {
+                    if (ParingChance())
+                    {
+                        stateMachine.SetState(stateDic[EnemyState.Paring]);
+                    }
+                }
+            }
+            else
+            {
+                if (stateMachine.CurrentState != stateDic[EnemyState.Attack])
+                {
+                    ani.SetTrigger("GetHit");
+                    Debug.Log(this.transform.name);
+                }
             }
 
             enemySlider.gameObject.SetActive(true);
@@ -392,22 +342,22 @@ public class Enemy : LivingObjects
 
             StartCoroutine(DestroyEffect(effect, 2f));
         }
-        if(!dead && targetObj == null)
+        else if (dead)
         {
-            targetObj = GameManager.Instance.player.gameObject;
+            enemySlider.hpSlider.value = 0f;
+            Debug.Log(this.transform.name);
+            Die();
         }
-        
-        else if (stateMachine.CurrentState == stateDic[EnemyState.Paring])
+        else if (stateMachine.CurrentState == stateDic[EnemyState.Paring] && !dead)
         {
             stateMachine.SetState(stateDic[EnemyState.Counterattack]);
         }
-        
-        else if(dead)
+
+        if (!dead && targetObj == null)
         {
-            enemySlider.hpSlider.value = 0f;
-            ani.SetFloat("Move", 0f);
-            Die();
+            targetObj = GameManager.Instance.player.gameObject;
         }
+       
     }
     public override void Die()
     {
@@ -428,13 +378,18 @@ public class Enemy : LivingObjects
         else
         {
             stateMachine.SetState(stateDic[EnemyState.Die]);
-            nav.isStopped = true;
             DropItem();
             nav.enabled = false;
             GameManager.Instance.GetExp(exp);
             StartCoroutine(DestroyBoss(this.transform.gameObject, 4f));
             QuestManager.Instance.TargetEnemyKilled(enemyId);
+            Boss boss = this.GetComponent<Boss>();
+            boss.attackDetectArea.SetActive(false);
         }
+        targetObj = null;
+        PlayerDetectArea.SetActive(false);
+        ani.SetFloat("Move", 0f);
+        ani.SetBool("Dead", dead);
     }
     private void DropItem()
     {

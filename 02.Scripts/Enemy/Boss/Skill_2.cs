@@ -6,11 +6,11 @@ public class Skill_2 : MonoBehaviour
 {   
     public float skillDamage;
 
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
-        if(other.tag == "Player" || other.tag == "DodgePlayer")
+        if (collision.gameObject.tag == "Player" || collision.gameObject.tag == "DodgePlayer")
         {
-            IDamageable damageable = other.GetComponent<IDamageable>();
+            IDamageable damageable = collision.gameObject.GetComponent<IDamageable>();
             damageable.OnDamage(skillDamage, Vector3.zero, Vector3.zero);
         }
     }

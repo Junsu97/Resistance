@@ -18,7 +18,7 @@ public class ZombieGeneral : Enemy
         public void OperateEnter()
         {
             nav.isStopped = true;
-            LookTarget();
+            owner.transform.LookAt(owner.targetObj.transform);
             owner.StartCoroutine("ZombieGeneralAttackCoroutin");
         }
 
@@ -30,12 +30,7 @@ public class ZombieGeneral : Enemy
         public void OperateUpdate()
         {
         }
-        private void LookTarget()
-        {
-            Vector3 dir = owner.targetObj.transform.position - owner.transform.position;
-
-            owner.transform.rotation = Quaternion.Lerp(owner.transform.rotation, Quaternion.LookRotation(dir), Time.deltaTime * owner.rotateSpeed);
-        }
+        
     }
     protected class ZombieGeneralParing : IState
     {
@@ -81,7 +76,7 @@ public class ZombieGeneral : Enemy
     {
         if (col.tag == "Player" || col.tag == "DodgePlayer")
         {
-            if (!dead && !Back)
+            if (!dead)
             {
                 if (!targetObj.GetComponent<LivingObjects>().dead && stateMachine.CurrentState != stateDic[EnemyState.Attack] && stateMachine.CurrentState != stateDic[EnemyState.Patrol])
                 {
@@ -94,9 +89,9 @@ public class ZombieGeneral : Enemy
     IEnumerator ZombieGeneralAttackCoroutin()
     {
         ani.Play("Attack");
-        yield return new WaitForSeconds(0.24f);
+        yield return new WaitForSeconds(0.5f);
         attackArea.SetActive(true);
-        yield return new WaitForSeconds(0.76f);
+        yield return new WaitForSeconds(0.5f);
         attackArea.SetActive(false);
         yield return new WaitForSeconds(1.5f);
 
