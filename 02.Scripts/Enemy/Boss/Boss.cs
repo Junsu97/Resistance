@@ -280,7 +280,7 @@ public class Boss : Enemy
     {
         transform.LookAt(targetObj.transform);
         ani.SetInteger("Attack",1);
-        yield return new WaitForSeconds(0.45f);
+        yield return new WaitForSeconds(0.35f);
         attackArea.SetActive(true);
         attackEffect.SetActive(true);
         audioSource.PlayOneShot(attackClip, 0.5f);

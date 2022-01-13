@@ -30,11 +30,11 @@ public class ItemEditor : EditorWindow
         GUILayout.Space(10f);
         EditorGUILayout.BeginHorizontal();
         GUILayout.FlexibleSpace();
-        if(GUILayout.Button("Add",GUILayout.Width(70f),GUILayout.Height(40f)))
+        if (GUILayout.Button("Add", GUILayout.Width(70f), GUILayout.Height(40f)))
         {
             AddItemToList();
         }
-        if(GUILayout.Button("Save", GUILayout.Width(70f), GUILayout.Height(40f)))
+        if (GUILayout.Button("Save", GUILayout.Width(70f), GUILayout.Height(40f)))
         {
             SaveItemList();
         }
@@ -63,7 +63,7 @@ public class ItemEditor : EditorWindow
 
     private void SaveItemList()
     {
-        string fileName = "ItemList.json";
+        string fileName = "itemList.json";
         string jsonPath = Application.dataPath + "/Resources/Data/";
         string jsonData = JsonUtility.ToJson(itemList, true);
         File.WriteAllText(jsonPath + fileName, jsonData);
@@ -98,12 +98,11 @@ public class ItemEditor : EditorWindow
             GUILayout.Space(10f);
             EditorGUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
-            if (GUILayout.Button("Remove", GUILayout.Width(60f), GUILayout.Height(20f))) ;
+            if (GUILayout.Button("Remove", GUILayout.Width(60f), GUILayout.Height(20f))) 
             {
                 RemoveItemFromList(item);
                 return;
             }
-
             EditorGUILayout.EndHorizontal();
             GUILayout.Space(10f);
 
