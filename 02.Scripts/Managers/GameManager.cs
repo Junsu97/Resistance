@@ -49,9 +49,7 @@ public class GameManager : Singleton<GameManager>
     public GameObject npcObjs;
     public Dictionary<int, GameObject> npcList;
     public int currentInteractId;
-    [Header("AlpahCam")]
-    public AlphaAdjustment alpahCam;
-
+  
     void Awake()
     {
         Application.targetFrameRate = 60;
@@ -116,12 +114,10 @@ public class GameManager : Singleton<GameManager>
         if(currentSceneName == "Level_3")
         {
             mainCam.farClipPlane = 1000f;
-            alpahCam.Level_3 = true;
         }
         else
         {
             mainCam.farClipPlane = 60f;
-            alpahCam.Level_3 = false;
         }
 
         player.transform.position = SpawnPos.position;

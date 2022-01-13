@@ -22,6 +22,7 @@ public class PlayerEditor : EditorWindow
         if(GUILayout.Button("Load Player Data"))
         {
             LoadPlayerData();
+            isGet = true;
         }
 
         EditorGUI.BeginDisabledGroup(isGet == false);

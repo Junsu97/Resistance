@@ -5,7 +5,6 @@ using UnityEngine.EventSystems;
 
 public class RotateCam : MonoBehaviour, IBeginDragHandler, IDragHandler
 {
-    static public RotateCam instance;
 
     public Transform Pivot;
     float camSpeed = 0.4f;
@@ -16,11 +15,6 @@ public class RotateCam : MonoBehaviour, IBeginDragHandler, IDragHandler
     float yAngle;
     float xAngletmp;
     float yAngletmp;
-    
-    void Start()
-    {
-    
-    }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
@@ -45,8 +39,4 @@ public class RotateCam : MonoBehaviour, IBeginDragHandler, IDragHandler
         Pivot.rotation = Quaternion.Euler(Pivot.rotation.x + xAngle, Pivot.rotation.y + yAngle, 0.0f);
     }
 
-    void Update()
-    {
-        
-    }
 }

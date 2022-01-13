@@ -6,10 +6,7 @@ public class AlphaAdjustment : MonoBehaviour
 {
     List<MeshRenderer> alphalist = new List<MeshRenderer>();
     Transform player;
-    public bool Level_3;
-    private void Awake()
-    {
-    }
+
     void Start()
     {
         player = GameManager.Instance.player.transform;
@@ -21,7 +18,7 @@ public class AlphaAdjustment : MonoBehaviour
     {
         WaitForSeconds upTime = new WaitForSeconds(time);
 
-        while(Level_3)
+        while(true)
         {
             if(alphalist.Count > 0)
             {
@@ -39,7 +36,7 @@ public class AlphaAdjustment : MonoBehaviour
 
             for(int i =0; i < hits.Length; i++)
             {
-                if (hits[i].transform.tag != "Terrain" && hits[i].transform.tag != "Player" && hits[i].transform.tag != "Enemy")
+                if (hits[i].transform.tag == "Wall")
                 {
                     MeshRenderer mesh = hits[i].collider.GetComponent<MeshRenderer>();
                     Color clr = mesh.material.color;
