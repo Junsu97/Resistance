@@ -68,6 +68,7 @@ public class Boss : Enemy
         Enemy enemy = transform.GetComponent<Enemy>();
         enemyData = DBManager.Instance.enemyDict[enemyId];
         SetEnemy(enemy, enemyData);
+        targetObj = GameManager.Instance.player.gameObject;
     }
 
     private void SetEnemy(Enemy enemy, EnemyData enemyData)
@@ -250,7 +251,6 @@ public class Boss : Enemy
                 {
                     int rand = Random.Range((int)EnemyState.Attack, (int)EnemyState.Skill2 + 1);
                     stateMachine.SetState(stateDic[(EnemyState)rand]);
-                    Debug.Log(ani.GetInteger("Attack"));
                 }
                 else
                 {
@@ -311,7 +311,7 @@ public class Boss : Enemy
         yield return new WaitForSeconds(0.1f);
         ani.SetInteger("Attack", 0);
         //yield return new WaitForSeconds(0.6f);
-        if (targetObj.GetComponent<LivingObjects>().dead)
+        if (targetObj.GetComponent<LivingObjects>().dead && !dead)
         {
             stateMachine.SetState(stateDic[EnemyState.Idle]);
         }
@@ -358,7 +358,7 @@ public class Boss : Enemy
 
         yield return new WaitForSeconds(0.1f);
        // yield return new WaitForSeconds(0.6f);
-        if (targetObj.GetComponent<LivingObjects>().dead)
+        if (targetObj.GetComponent<LivingObjects>().dead && !dead)
         {
             stateMachine.SetState(stateDic[EnemyState.Idle]);
         }
@@ -421,7 +421,7 @@ public class Boss : Enemy
         Skill_1Effect_4.SetActive(false);
         Skill_1Area_4.SetActive(false);
         ani.SetInteger("Attack", 0);
-        if(targetObj.GetComponent<LivingObjects>().dead)
+        if(targetObj.GetComponent<LivingObjects>().dead && !dead)
         {
             stateMachine.SetState(stateDic[EnemyState.Idle]);
         }
@@ -448,7 +448,7 @@ public class Boss : Enemy
         yield return new WaitForSeconds(0.1f);
         ani.SetInteger("Attack", 0);
 
-        if (targetObj.GetComponent<LivingObjects>().dead)
+        if (targetObj.GetComponent<LivingObjects>().dead && !dead)
         {
             stateMachine.SetState(stateDic[EnemyState.Idle]);
         }

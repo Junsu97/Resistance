@@ -35,8 +35,7 @@ public class PlayerEditor : EditorWindow
         playerData.health = float.Parse(EditorGUILayout.TextField("Health", playerData.health.ToString()));
         playerData.mana = float.Parse(EditorGUILayout.TextField("Mana", playerData.mana.ToString()));
         playerData.gold = int.Parse(EditorGUILayout.TextField("Gold", playerData.gold.ToString()));
-
-        if(GUILayout.Button("Save Player Data"))
+        if (GUILayout.Button("Save Player Data"))
         {
             SavePlayerData();
         }

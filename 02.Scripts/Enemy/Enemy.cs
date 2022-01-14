@@ -102,10 +102,6 @@ public class Enemy : LivingObjects
             {
                 owner.stateMachine.SetState(owner.stateDic[EnemyState.Chase]);
             }
-            if (owner.dead)
-            {
-                owner.stateMachine.SetState(owner.stateDic[EnemyState.Die]);
-            }
         }
 
         public void OperateExit()
@@ -152,10 +148,6 @@ public class Enemy : LivingObjects
             else
             {
                 TraceTarget();
-            }
-            if(owner.dead)
-            {
-                owner.stateMachine.SetState(owner.stateDic[EnemyState.Die]);
             }
         }
         private void TraceTarget()
@@ -306,7 +298,7 @@ public class Enemy : LivingObjects
     public override void OnDamage(float damage, Vector3 hitPoint, Vector3 hitNormal, bool isCrit = false)
     {
        
-        if(!dead && stateMachine.CurrentState != stateDic[EnemyState.Paring])
+        if(!dead && stateMachine.CurrentState != stateDic[EnemyState.Paring]) // 플레이어의 공격을 받는 상황이라면
         {
             base.OnDamage(damage, hitPoint, hitNormal, isCrit);
 
@@ -342,12 +334,6 @@ public class Enemy : LivingObjects
 
             StartCoroutine(DestroyEffect(effect, 2f));
         }
-        else if (dead)
-        {
-            enemySlider.hpSlider.value = 0f;
-            Debug.Log(this.transform.name);
-            Die();
-        }
         else if (stateMachine.CurrentState == stateDic[EnemyState.Paring] && !dead)
         {
             stateMachine.SetState(stateDic[EnemyState.Counterattack]);
@@ -357,7 +343,6 @@ public class Enemy : LivingObjects
         {
             targetObj = GameManager.Instance.player.gameObject;
         }
-       
     }
     public override void Die()
     {
@@ -365,7 +350,6 @@ public class Enemy : LivingObjects
         if(enemyType != EnemyData.EnemyType.boss)
         {
             stateMachine.SetState(stateDic[EnemyState.Die]);
-            nav.isStopped = true;
             DropItem();
             nav.enabled = false;
             GameManager.Instance.GetExp(exp);
