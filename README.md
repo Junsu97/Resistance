@@ -12,5 +12,5 @@ Unity 엔진을 기반으로 제작된 3D 액션 RPG게임으로 포트폴리오
 
 
 ## 영상 및 기술서
-- 동영상 : 추가예정
+- 동영상 : https://youtu.be/ZvGwv-6uLC0
 - 기술서 : https://docs.google.com/document/d/1MSJ34sGw1bHG4cungnv_7L1Mn81lkdYmtkAslfVELfM/edit?usp=sharing
